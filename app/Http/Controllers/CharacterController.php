@@ -7,19 +7,28 @@ use Illuminate\Support\Facades\Http;
 
 class CharacterController extends Controller
 {
-    public function index()
-    {
-        $response = Http::get('https://rickandmortyapi.com/api/character');
+    public function getAllCharacters()
+{
+    $response = Http::withoutVerifying()->get('https://rickandmortyapi.com/api/character/');
+
+    if ($response->successful()) {
         $characters = $response->json()['results'];
-
         return response()->json($characters);
+    } else {
+        return response()->json(['error' => 'No se pudo obtener los personajes'], 500);
     }
+}
 
-    public function show($id)
+
+    public function getCharacter($id)
     {
-        $response = Http::get("https://rickandmortyapi.com/api/character/{$id}");
+        $response = Http::withoutVerifying()->get("https://rickandmortyapi.com/api/character/{$id}");
         $character = $response->json();
 
-        return response()->json($character);
+        if ($response->ok()) {
+            return response()->json($character);
+        } else {
+            return response()->json(['error' => 'Personaje no encontrado'], 404);
+        }
     }
 }
